@@ -1,0 +1,21 @@
+# Foundry
+cache/
+out/
+broadcast/
+lib/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Deployment artifacts (commit the JSON address files, but not the raw broadcast logs)
+deployments/*.txt
+
+# Node / subgraph
+node_modules/
+subgraph/generated/
+subgraph/build/
+
+# OS
+.DS_Store

@@ -1,0 +1,33 @@
+[profile.default]
+src            = "src"
+out            = "out"
+libs           = ["lib"]
+solc_version   = "0.8.24"
+optimizer      = true
+optimizer_runs = 200
+via_ir         = false
+
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+    "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+# Allow scripts to write deployment JSON files.
+fs_permissions = [
+    { access = "read-write", path = "./deployments" },
+    { access = "read", path = "./out" },
+]
+
+[rpc_endpoints]
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+base_sepolia     = "${BASE_SEPOLIA_RPC_URL}"
+
+[etherscan]
+# Etherscan v2 API key works across all chains (single key, multi-chain).
+arbitrum_sepolia = { key = "${ETHERSCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api" }
+base_sepolia     = { key = "${ETHERSCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api" }
+
+[fmt]
+line_length  = 120
+tab_width    = 4

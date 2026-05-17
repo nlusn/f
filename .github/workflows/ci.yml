@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  FOUNDRY_PROFILE: default
+
+jobs:
+  contracts:
+    name: Build · Test · Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Show forge version
+        run: forge --version
+
+      - name: Check formatting
+        run: forge fmt --check
+
+      - name: Compile (sizes)
+        run: forge build --sizes
+
+      - name: Run full test suite
+        run: forge test -vvv
+
+      - name: Coverage (lcov)
+        run: forge coverage --report lcov --report summary
+
+      - name: Coverage gate (≥ 90% line coverage on src/)
+        run: |
+          # Parse lcov.info and fail if line-coverage on src/ < 90%.
+          python - <<'PY'
+          import re, sys, pathlib
+          data = pathlib.Path("lcov.info").read_text()
+          hits = found = 0
+          keep = False
+          for line in data.splitlines():
+              if line.startswith("SF:"):
+                  keep = "/src/" in line and "/test/" not in line and "/script/" not in line
+              if keep and line.startswith("LH:"):
+                  hits += int(line.split(":")[1])
+              if keep and line.startswith("LF:"):
+                  found += int(line.split(":")[1])
+          pct = (hits / found * 100) if found else 0
+          print(f"src/ line coverage: {pct:.2f}% ({hits}/{found})")
+          if pct < 90:
+              sys.exit(f"Coverage {pct:.2f}% < 90% threshold")
+          PY
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: lcov.info
+
+  slither:
+    name: Slither static analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry (slither needs the build artifacts)
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Pre-build for slither
+        run: forge build
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
+        with:
+          fail-on: medium
+          slither-args: --filter-paths "test/|script/|lib/"
+
+  lint:
+    name: Lint (solhint · prettier)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install lint tools
+        run: npm install --no-save solhint prettier
+
+      - name: Solhint
+        run: npx solhint "src/**/*.sol"
+
+      - name: Prettier
+        run: npx prettier --check "frontend/**/*.{js,html,css}" "subgraph/**/*.{ts,yaml,graphql,json}" "**/*.md"
+
+  subgraph:
+    name: Subgraph build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Foundry (need compiled ABIs)
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Build contracts to populate out/
+        run: forge build
+
+      - name: Refresh subgraph ABIs from out/
+        working-directory: subgraph
+        run: |
+          for c in AMM LendingPool YieldVault AchievementNFT ProtocolGovernor; do
+            jq '.abi' "../out/${c}.sol/${c}.json" > "abis/${c}.json"
+          done
+
+      - name: Install subgraph deps
+        working-directory: subgraph
+        run: npm install
+
+      - name: Subgraph codegen + build
+        working-directory: subgraph
+        run: |
+          npm run codegen
+          npm run build

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeFi Super-App</title>
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        DeFi Super-App
+      </div>
+      <div class="wallet">
+        <span id="network-pill" class="pill pill-muted">not connected</span>
+        <span id="account-pill" class="pill pill-muted">—</span>
+        <button id="connect-btn" class="btn btn-primary">Connect wallet</button>
+      </div>
+    </header>
+
+    <!-- Sticky wrong-network banner; hidden when chain is correct. -->
+    <div id="network-banner" class="banner hidden">
+      <span>You're on the wrong network.</span>
+      <button id="switch-btn" class="btn btn-secondary">Switch to Base Sepolia</button>
+    </div>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="swap">Swap</button>
+      <button class="tab" data-tab="vault">Vault</button>
+      <button class="tab" data-tab="lend">Lend</button>
+      <button class="tab" data-tab="govern">Govern</button>
+    </nav>
+
+    <main>
+      <!-- SWAP -->
+      <section id="page-swap" class="page active">
+        <div class="card">
+          <h2>Swap</h2>
+          <p class="muted">
+            Trade <span data-token-a-symbol>Token A</span> ↔
+            <span data-token-b-symbol>Token B</span> via the constant-product AMM.
+          </p>
+          <div class="grid grid-2">
+            <label>
+              From
+              <select id="swap-token-in" class="input"></select>
+              <input
+                id="swap-amount-in"
+                type="number"
+                min="0"
+                step="any"
+                class="input"
+                placeholder="0.0"
+              />
+            </label>
+            <label>
+              Estimated out
+              <input id="swap-amount-out" type="text" class="input" placeholder="—" readonly />
+              <small id="swap-spot" class="muted">Spot price will appear here</small>
+            </label>
+          </div>
+          <button id="swap-btn" class="btn btn-primary" disabled>Swap</button>
+        </div>
+
+        <div class="card">
+          <h3>Reserves</h3>
+          <p>Reserve A: <strong id="reserve-a">—</strong></p>
+          <p>Reserve B: <strong id="reserve-b">—</strong></p>
+        </div>
+
+        <div class="card">
+          <h3>Recent swaps</h3>
+          <p class="muted">
+            Pulled from
+            <a href="https://thegraph.com" target="_blank" rel="noopener">The Graph</a> subgraph.
+          </p>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>In</th>
+                <th>Out</th>
+              </tr>
+            </thead>
+            <tbody id="recent-swaps">
+              <tr>
+                <td colspan="4" class="muted">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VAULT -->
+      <section id="page-vault" class="page">
+        <div class="card">
+          <h2>Yield Vault (ERC-4626)</h2>
+          <p class="muted">Deposit the borrow token to mint vault shares.</p>
+          <p>Your shares: <strong id="vault-shares">—</strong></p>
+          <p>Underlying value: <strong id="vault-underlying">—</strong></p>
+          <div class="grid grid-2">
+            <label>
+              Deposit amount
+              <input
+                id="vault-deposit-amount"
+                type="number"
+                min="0"
+                step="any"
+                class="input"
+                placeholder="0.0"
+              />
+            </label>
+            <label>
+              Withdraw shares
+              <input
+                id="vault-withdraw-amount"
+                type="number"
+                min="0"
+                step="any"
+                class="input"
+                placeholder="0.0"
+              />
+            </label>
+          </div>
+          <div class="btn-row">
+            <button id="vault-deposit-btn" class="btn btn-primary" disabled>Deposit</button>
+            <button id="vault-withdraw-btn" class="btn btn-secondary" disabled>Withdraw</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEND -->
+      <section id="page-lend" class="page">
+        <div class="card">
+          <h2>Lending position</h2>
+          <p>Collateral: <strong id="lend-collateral">—</strong></p>
+          <p>Debt: <strong id="lend-debt">—</strong></p>
+          <p>Health factor: <strong id="lend-health">—</strong></p>
+        </div>
+        <div class="card">
+          <h3>Deposit collateral</h3>
+          <input
+            id="lend-collateral-amount"
+            type="number"
+            min="0"
+            step="any"
+            class="input"
+            placeholder="0.0"
+          />
+          <button id="lend-deposit-btn" class="btn btn-primary" disabled>Deposit collateral</button>
+        </div>
+        <div class="card">
+          <h3>Borrow</h3>
+          <input
+            id="lend-borrow-amount"
+            type="number"
+            min="0"
+            step="any"
+            class="input"
+            placeholder="0.0"
+          />
+          <button id="lend-borrow-btn" class="btn btn-secondary" disabled>Borrow</button>
+        </div>
+      </section>
+
+      <!-- GOVERN -->
+      <section id="page-govern" class="page">
+        <div class="card">
+          <h2>Your voting power</h2>
+          <p>PROTO balance: <strong id="gov-balance">—</strong></p>
+          <p>Voting power: <strong id="gov-votes">—</strong></p>
+          <p>Delegate: <strong id="gov-delegate">—</strong></p>
+          <button id="gov-delegate-btn" class="btn btn-secondary" disabled>Delegate to self</button>
+        </div>
+        <div class="card">
+          <h2>Active proposals</h2>
+          <p class="muted">Proposals are loaded from the subgraph; state is resolved on-chain.</p>
+          <div id="proposal-list">
+            <p class="muted">Loading proposals…</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

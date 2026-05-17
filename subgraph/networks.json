@@ -1,0 +1,20 @@
+{
+  "base-sepolia": {
+    "AMM": {
+      "address": "0xeD03483511cd41Ba895BE5c04B3AF1a215B58D23",
+      "startBlock": 41629879
+    },
+    "LendingPool": {
+      "address": "0xc02E02e7552DAE658725db323c23f727890698dd",
+      "startBlock": 41629879
+    },
+    "YieldVault": {
+      "address": "0xe6baA064DCFD11bd64c09B2c0af51433270e8771",
+      "startBlock": 41629879
+    },
+    "AchievementNFT": {
+      "address": "0xCa6f8b712F396c94EF2fdB05320aBBd7602cF5D8",
+      "startBlock": 41629879
+    }
+  }
+}

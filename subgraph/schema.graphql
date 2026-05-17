@@ -1,0 +1,104 @@
+# =============================================================================
+# DeFi Super-App — subgraph schema
+#
+# 7 entities total (spec requires ≥4):
+#   Swap            — every AMM swap
+#   LiquidityEvent  — addLiquidity / removeLiquidity
+#   LoanPosition    — current borrow + collateral per user (mutable)
+#   VaultEvent      — vault deposit / withdraw / yield harvest
+#   Achievement     — minted soulbound NFTs
+#   Proposal        — Governor.ProposalCreated rows
+#   ProtocolMetric  — global rollups (singleton id = "global")
+# =============================================================================
+
+type Swap @entity(immutable: true, timestamps: true) {
+  id: Bytes! # txHash-logIndex
+  user: Bytes! # swapper address
+  tokenIn: Bytes!
+  tokenOut: Bytes!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+enum LiquidityAction {
+  ADD
+  REMOVE
+}
+
+type LiquidityEvent @entity(immutable: true, timestamps: true) {
+  id: Bytes!
+  provider: Bytes!
+  action: LiquidityAction!
+  amountA: BigInt!
+  amountB: BigInt!
+  lpAmount: BigInt! # minted on ADD, burned on REMOVE
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+# Mutable: tracks the latest state per borrower. The id is the user address bytes,
+# so successive Borrowed / Repaid / Liquidated events all update the same row.
+type LoanPosition @entity(immutable: false) {
+  id: Bytes! # user address
+  user: Bytes!
+  collateral: BigInt! # current collateral in LendingPool
+  debt: BigInt! # current outstanding debt (principal + accrued)
+  lastEvent: String! # last action that touched this position
+  lastUpdate: BigInt! # block timestamp
+}
+
+enum VaultAction {
+  DEPOSIT
+  WITHDRAW
+  YIELD_HARVEST
+}
+
+type VaultEvent @entity(immutable: true, timestamps: true) {
+  id: Bytes!
+  user: Bytes! # caller; for harvest = strategist
+  action: VaultAction!
+  assets: BigInt!
+  shares: BigInt! # 0 for YIELD_HARVEST
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Achievement @entity(immutable: true, timestamps: true) {
+  id: Bytes! # tokenId as bytes
+  tokenId: BigInt!
+  recipient: Bytes!
+  achievementType: Int! # enum index from contract
+  tier: Int! # enum index from contract
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Proposal @entity(immutable: false) {
+  id: Bytes! # proposalId as bytes
+  proposalId: BigInt!
+  proposer: Bytes!
+  description: String!
+  voteStart: BigInt! # block / timestamp where voting opens
+  voteEnd: BigInt! # block / timestamp where voting closes
+  createdAt: BigInt! # block timestamp the proposal was created
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+# Singleton — id is always "global".
+type ProtocolMetric @entity(immutable: false) {
+  id: ID!
+  totalSwaps: BigInt!
+  totalLiquidityEvents: BigInt!
+  totalVaultDeposits: BigInt! # cumulative assets deposited
+  totalLoansOpened: BigInt!
+  totalLiquidations: BigInt!
+  totalAchievements: BigInt!
+  totalProposals: BigInt!
+}

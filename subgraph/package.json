@@ -1,0 +1,21 @@
+{
+  "name": "defi-super-app-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ b-ch-t-2-final-project",
+    "create-local": "graph create --node http://localhost:8020/ b-ch-t-2-final-project",
+    "remove-local": "graph remove --node http://localhost:8020/ b-ch-t-2-final-project",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 b-ch-t-2-final-project",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.79.2",
+    "@graphprotocol/graph-ts": "0.35.1"
+  },
+  "devDependencies": {
+    "matchstick-as": "0.6.0"
+  }
+}

@@ -1,0 +1,587 @@
+/* =============================================================================
+   Tokens
+============================================================================= */
+:root {
+  /* Neutrals — warm, near-black; deliberately not the generic "dark theme" blue. */
+  --bg: #09090b;
+  --surface: #111114;
+  --surface-2: #17171b;
+  --border: #26262b;
+  --border-strong: #3a3a40;
+
+  --text: #f4f4f5;
+  --text-muted: #8b8b91;
+  --text-dim: #5f5f64;
+
+  /* Single accent — used sparingly. Buttons are inverted (light on dark). */
+  --fg-invert: #fafafa;
+  --bg-invert: #18181b;
+
+  /* States — only for proposal/health/error pills, never decorative. */
+  --success: #6fcf97;
+  --danger: #e57373;
+  --warning: #d9b056;
+
+  --ring: rgba(244, 244, 245, 0.32);
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-2: 0 1px 0 rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+
+  /* Custom easings — built-in curves are too soft to feel intentional. */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Type stack — Inter falls back to the system UI font on every platform. */
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Ubuntu,
+    sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+::selection {
+  background: rgba(244, 244, 245, 0.18);
+}
+
+/* =============================================================================
+   Top bar
+============================================================================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+/* Restrained mark — a single small glyph instead of a gradient blob. */
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: var(--fg-invert);
+  display: inline-block;
+}
+
+.wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =============================================================================
+   Pills (network / account)
+============================================================================= */
+.pill {
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+.pill-ok {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.pill-warn {
+  color: var(--warning);
+  border-color: rgba(217, 176, 86, 0.32);
+}
+
+/* =============================================================================
+   Wrong-network banner
+============================================================================= */
+.banner {
+  background: rgba(217, 176, 86, 0.06);
+  border-bottom: 1px solid rgba(217, 176, 86, 0.22);
+  color: var(--warning);
+  padding: 9px 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.hidden {
+  display: none !important;
+}
+
+/* =============================================================================
+   Tabs — animated underline
+============================================================================= */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.tab {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 14px 14px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color 140ms var(--ease);
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 1.5px;
+  background: var(--fg-invert);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 220ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    color: var(--text);
+  }
+}
+
+.tab.active {
+  color: var(--text);
+}
+.tab.active::after {
+  transform: scaleX(1);
+}
+
+/* =============================================================================
+   Main / cards
+============================================================================= */
+main {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.page {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.page.active {
+  display: flex;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-1);
+}
+
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.card p {
+  margin: 6px 0;
+  font-size: 13px;
+}
+.card strong {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+/* =============================================================================
+   Inputs
+============================================================================= */
+.input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+  transition:
+    border-color 140ms var(--ease),
+    box-shadow 140ms var(--ease);
+}
+.input:hover {
+  border-color: var(--border-strong);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  margin: 10px 0;
+}
+.grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 640px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================================================
+   Buttons
+============================================================================= */
+.btn {
+  -webkit-appearance: none;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 13px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms var(--ease),
+    border-color 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) {
+    background: var(--border);
+    border-color: var(--border-strong);
+  }
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--fg-invert);
+  color: var(--bg-invert);
+  border-color: var(--fg-invert);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover:not(:disabled) {
+    background: #ffffff;
+    border-color: #ffffff;
+  }
+}
+
+.btn-secondary {
+  background: transparent;
+}
+
+.btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* =============================================================================
+   Data table
+============================================================================= */
+.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.data th,
+.data td {
+  text-align: left;
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.data th {
+  color: var(--text-dim);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.data tr:last-child td {
+  border-bottom: none;
+}
+.data tbody tr {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: rowIn 320ms var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+@keyframes rowIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
+   Proposals
+============================================================================= */
+#proposal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proposal {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  background: var(--surface-2);
+  opacity: 0;
+  transform: translateY(4px);
+  animation: rowIn 320ms var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.proposal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.proposal-head strong {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.proposal-state {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+/* Collapse the 8-state palette down to 3 visual treatments. */
+.state-Active,
+.state-Pending {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.state-Succeeded,
+.state-Queued,
+.state-Executed {
+  color: var(--success);
+  border-color: rgba(111, 207, 151, 0.28);
+}
+.state-Defeated,
+.state-Canceled,
+.state-Expired {
+  color: var(--danger);
+  border-color: rgba(229, 115, 115, 0.28);
+}
+
+.proposal-desc {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 6px 0;
+}
+.proposal-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.proposal-votes {
+  display: flex;
+  gap: 6px;
+}
+.proposal-votes .btn {
+  padding: 5px 11px;
+  font-size: 11.5px;
+}
+
+/* =============================================================================
+   Toasts — top-anchored, retargetable via transition (not keyframes)
+============================================================================= */
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  min-width: 240px;
+  max-width: 340px;
+  font-size: 12.5px;
+  pointer-events: auto;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.34);
+
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+/* Entrance / exit via @starting-style — falls back gracefully where unsupported. */
+@starting-style {
+  .toast {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.toast small {
+  display: block;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+
+/* Variant accent rail on the left edge — keeps toasts identifiable at a glance. */
+.toast::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--text-dim);
+}
+.toast {
+  position: relative;
+  padding-left: 14px;
+}
+.toast.success::before {
+  background: var(--success);
+}
+.toast.error::before {
+  background: var(--danger);
+}
+.toast.warning::before {
+  background: var(--warning);
+}
+
+/* =============================================================================
+   Reduced motion — keep fades, kill transforms/animations
+============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 120ms !important;
+  }
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+  .tab::after {
+    transition: none;
+  }
+  .data tbody tr,
+  .proposal {
+    transform: none;
+    opacity: 1;
+    animation: none;
+  }
+}
