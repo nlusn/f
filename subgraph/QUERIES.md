@@ -35,9 +35,9 @@ Sample response:
       {
         "id": "0xabc...01",
         "user": "0xfa...",
-        "tokenIn":  "0xWETH...",
+        "tokenIn": "0xWETH...",
         "tokenOut": "0xUSDC...",
-        "amountIn":  "1000000000000000000",
+        "amountIn": "1000000000000000000",
         "amountOut": "2000000000",
         "blockTimestamp": "1740009600",
         "transactionHash": "0xabc..."
@@ -127,11 +127,7 @@ query VaultEventsByUser($user: Bytes!, $limit: Int = 50) {
 
 ```graphql
 query AchievementsByUser($user: Bytes!) {
-  achievements(
-    where: { recipient: $user }
-    orderBy: blockTimestamp
-    orderDirection: desc
-  ) {
+  achievements(where: { recipient: $user }, orderBy: blockTimestamp, orderDirection: desc) {
     tokenId
     achievementType
     tier
@@ -146,7 +142,7 @@ query AchievementsByUser($user: Bytes!) {
 
 ## 6. Active proposals — `proposals` (drives the Govern page)
 
-**Use case**: The Governor page lists indexed proposals; each row's *state* is
+**Use case**: The Governor page lists indexed proposals; each row's _state_ is
 resolved live via `Governor.state(proposalId)` on-chain (state is dynamic and
 should not be cached in the subgraph).
 
