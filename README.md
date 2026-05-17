@@ -11,6 +11,8 @@ BCHT2 capstone:
 > Chainlink, governed by an on-chain DAO with a 2-day Timelock, indexed via
 > The Graph, deployed to an L2 testnet.
 
+**Demo video:** [youtu.be/PMT5PIkk3Dw](https://youtu.be/PMT5PIkk3Dw)
+
 ## Components
 
 | Layer       | Tech                                                                                                             |
